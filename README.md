@@ -1,6 +1,18 @@
 ![VoidSpawn](https://www.spigotmc.org/attachments/voidspawn-png.135493/)
 
-> This fork adds a Console mode that runs configured void commands from the server console.
+About this fork...
+------
+This fork adds a `console` mode. It works like `command` mode, but runs the configured command from the server console instead of as the player.
+
+Use it by setting a world's mode to `console` and configuring the `command` option. Player placeholders use the existing `${...}` format.
+
+```yaml
+void:
+  mode: console
+  detector: void
+  options:
+    command: brtp player ${player.name} world NODELAY
+```
 
 VoidSpawn [![CircleCI](https://circleci.com/gh/endercrest/VoidSpawn.svg?style=svg)](https://circleci.com/gh/endercrest/VoidSpawn)
 =========
