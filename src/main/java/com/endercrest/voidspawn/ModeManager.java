@@ -29,6 +29,7 @@ public class ModeManager {
             addMode("touch", new TouchMode());
             addMode("none", new None());
             addMode("command", new CommandMode(plugin));
+            addMode("console", new ConsoleMode(plugin));
             addMode("looper", new LooperMode());
 
             // Load the correct island mode.

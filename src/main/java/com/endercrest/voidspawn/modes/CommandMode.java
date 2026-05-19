@@ -6,12 +6,15 @@ import com.endercrest.voidspawn.TeleportResult;
 import com.endercrest.voidspawn.VoidSpawn;
 import com.endercrest.voidspawn.options.Option;
 import com.endercrest.voidspawn.modes.status.Status;
+import com.endercrest.voidspawn.utils.CommandPlaceholderUtil;
 import com.endercrest.voidspawn.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class CommandMode extends BaseMode {
@@ -41,17 +44,10 @@ public class CommandMode extends BaseMode {
 
         Option<String> commandOption = getOption(BaseMode.OPTION_COMMAND);
 
-        String commandString = commandOption.getValue(world).orElse("")
-                .replace("${player.name}", player.getName())
-                .replace("${player.uuid}", player.getUniqueId().toString())
-                .replace("${player.coord.x}", player.getLocation().getBlockX() + "")
-                .replace("${player.coord.y}", player.getLocation().getBlockY() + "")
-                .replace("${player.coord.z}", player.getLocation().getBlockZ() + "")
-                .replace("${player.coord.world}", player.getLocation().getWorld().getName())
-                .replace("${player.touch.x}", touch.getBlockX() + "")
-                .replace("${player.touch.y}", touch.getBlockY() + "")
-                .replace("${player.touch.z}", touch.getBlockZ() + "")
-                .replace("${player.touch.world}", touch.getWorld().getName());
+        String commandString = CommandPlaceholderUtil.apply(
+                commandOption.getValue(world).orElse(""),
+                getPlaceholders(player, touch)
+        );
 
         String[] commands = commandString.split(";");
         TeleportResult result = TeleportResult.SUCCESS;
@@ -63,7 +59,7 @@ public class CommandMode extends BaseMode {
                 String cmd = perms[1].trim();
                 status = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
             } else {
-                status = player.performCommand(command.trim());
+                status = dispatchCommand(player, command.trim());
             }
 
             if (!status) {
@@ -75,6 +71,25 @@ public class CommandMode extends BaseMode {
             player.sendMessage(MessageUtil.colorize(VoidSpawn.prefix + "&cContact Admin. One of the commands failed."));
         }
         return result;
+    }
+
+    protected boolean dispatchCommand(Player player, String command) {
+        return player.performCommand(command);
+    }
+
+    private Map<String, String> getPlaceholders(Player player, Location touch) {
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("player.name", player.getName());
+        placeholders.put("player.uuid", player.getUniqueId().toString());
+        placeholders.put("player.coord.x", player.getLocation().getBlockX() + "");
+        placeholders.put("player.coord.y", player.getLocation().getBlockY() + "");
+        placeholders.put("player.coord.z", player.getLocation().getBlockZ() + "");
+        placeholders.put("player.coord.world", player.getLocation().getWorld().getName());
+        placeholders.put("player.touch.x", touch.getBlockX() + "");
+        placeholders.put("player.touch.y", touch.getBlockY() + "");
+        placeholders.put("player.touch.z", touch.getBlockZ() + "");
+        placeholders.put("player.touch.world", touch.getWorld().getName());
+        return placeholders;
     }
 
     @Override
