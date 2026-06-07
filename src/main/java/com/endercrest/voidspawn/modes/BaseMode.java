@@ -16,6 +16,7 @@ public abstract class BaseMode extends BasicOptionContainer implements Mode {
     public static final OptionIdentifier<Integer> OPTION_DAMAGE = new OptionIdentifier<>(Integer.class, "damage", "Amount of damage applied upon entering the void");
     public static final OptionIdentifier<Integer> OPTION_BOUNCE = new OptionIdentifier<>(Integer.class, "bounce", "Number of times to bounce from the void before activating mode");
     public static final OptionIdentifier<Float> OPTION_MIN_BOUNCE_VELOCITY = new OptionIdentifier<>(Float.class, "min_bounce_velocity", "The minimum bounce velocity");
+    public static final OptionIdentifier<Integer> OPTION_COOLDOWN = new OptionIdentifier<>(Integer.class, "cooldown", "Seconds to wait before re-activating while a player remains detected");
 
     public BaseMode() {
         attachOption(new SoundOption(OPTION_SOUND));
@@ -29,5 +30,6 @@ public abstract class BaseMode extends BasicOptionContainer implements Mode {
         attachOption(new IntegerOption(OPTION_DAMAGE, 0));
         attachOption(new IntegerOption(OPTION_BOUNCE, 0));
         attachOption(new FloatOption(OPTION_MIN_BOUNCE_VELOCITY, 2.0f));
+        attachOption(new IntegerOption(OPTION_COOLDOWN, 0));
     }
 }

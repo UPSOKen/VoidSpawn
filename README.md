@@ -5,6 +5,7 @@ About this fork...
 This fork adds a `console` mode. It works like `command` mode, but runs the configured command from the server console instead of as the player.
 
 Use it by setting a world's mode to `console` and configuring the `command` option. Player placeholders use the existing `${...}` format.
+The optional `cooldown` setting prevents repeated activation while a player is still being detected, which is useful for delayed teleport commands.
 
 ```yaml
 void:
@@ -12,6 +13,7 @@ void:
   detector: void
   options:
     command: brtp player ${player.name} world NODELAY
+    cooldown: 5
 ```
 
 VoidSpawn [![CircleCI](https://circleci.com/gh/endercrest/VoidSpawn.svg?style=svg)](https://circleci.com/gh/endercrest/VoidSpawn)

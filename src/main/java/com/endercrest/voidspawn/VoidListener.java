@@ -32,6 +32,9 @@ public class VoidListener implements Listener {
     private final Cache<UUID, Instant> activationTracker = CacheBuilder.newBuilder()
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .build();
+    private final Cache<String, Instant> cooldownTracker = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.DAYS)
+            .build();
     private final Cache<UUID, Integer> bounceTracker = CacheBuilder.newBuilder()
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .build();
@@ -69,6 +72,11 @@ public class VoidListener implements Listener {
 
         Instant instant = activationTracker.getIfPresent(player.getUniqueId());
         if (mode != null) {
+            int cooldown = getCooldown(mode, world);
+            if (isOnCooldown(player, world, cooldown)) {
+                return;
+            }
+
             try {
                 Integer bounceMax = mode.getOption(BaseMode.OPTION_BOUNCE).getValue(world).orElse(0);
                 if (bounceMax > 0) {
@@ -94,6 +102,7 @@ public class VoidListener implements Listener {
                 }
             } catch (ExecutionException ignored) {}
 
+            startCooldown(player, world, cooldown);
             activateMessage(mode, player, world);
             activateInventoryClear(mode, player, world);
 
@@ -119,6 +128,29 @@ public class VoidListener implements Listener {
 
             }
         }
+    }
+
+    private int getCooldown(Mode mode, World world) {
+        return Math.max(0, mode.getOption(BaseMode.OPTION_COOLDOWN).getValue(world).orElse(0));
+    }
+
+    private boolean isOnCooldown(Player player, World world, int cooldown) {
+        if (cooldown <= 0) {
+            return false;
+        }
+
+        Instant lastActivation = cooldownTracker.getIfPresent(getCooldownKey(player, world));
+        return lastActivation != null && Instant.now().isBefore(lastActivation.plus(cooldown, ChronoUnit.SECONDS));
+    }
+
+    private void startCooldown(Player player, World world, int cooldown) {
+        if (cooldown > 0) {
+            cooldownTracker.put(getCooldownKey(player, world), Instant.now());
+        }
+    }
+
+    private String getCooldownKey(Player player, World world) {
+        return player.getUniqueId() + ":" + world.getUID();
     }
 
     @EventHandler
